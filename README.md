@@ -21,7 +21,7 @@
 - Создание сущности: POST /api/create
 - Удаление сущности: DELETE /api/delete/{id}
 - Получение сущности: GET /api/get/{id}
-- Получение всех сущностей: POST /api/getAll
+- Получение всех сущностей: GET /api/getAll
 - Обновление сущности: PATCH /api/patch/{id}
   
   
