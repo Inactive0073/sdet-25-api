@@ -1,23 +1,43 @@
 import allure
 import pytest
-from src.api.client import APIClient
+
 from src.api.actions.entity_actions import EntityActions
-from src.api.models.entity import Entity
+from src.api.client import APIClient
+from src.api.models import EntityRequest, EntityResponse
 
 
-@allure.epic("API Testing")
-@allure.feature("Entity Management")
-@allure.story("Создание сущности")
+@allure.parent_suite("API test-service")
+@allure.suite("Entity Management")
+@allure.sub_suite("POST /api/create")
+@allure.epic("API test-service")
+@allure.feature("Entity")
+@allure.story("Создание новой сущности")
 @allure.severity(allure.severity_level.CRITICAL)
+@allure.tag("api", "positive", "create", "v1.0")
+@allure.label("owner", "Alexey Yumanov")
+@allure.testcase("TC-001")
+@allure.description("""
+**Цель:** Проверить успешное создание сущности через эндпоинт `/api/create`.
+
+**Ожидаемый результат:**
+- HTTP 201
+- Возвращён объект `EntityResponse` с корректным `id`
+- Все поля совпадают с отправленными данными
+""")
 @pytest.mark.api
 class TestCreateEntity:
     @allure.title("TC-001: Создание новой сущности")
-    def test_create_entity(self):
-        client = APIClient()
-        entity_actions = EntityActions(client)
+    def test_create_entity(self, entity_actions: EntityActions, entity: EntityResponse):
+        request_data = EntityRequest.random()
 
-        test_entity = Entity.random()
-        _id: int = entity_actions.create_entity(test_entity)
-
-        assert _id is not None, "ID новой сущности не получен"
-        assert entity_actions.get_entity_by_id(_id).title == test_entity.title, "Название в ответе не совпадает"
+        created = entity_actions.create_entity(request_data)
+        assert isinstance(created, EntityResponse), (
+            "Ответ не соответствует модели EntityResponse"
+        )
+        assert created.id > 0, "ID должен быть положительным числом"
+        assert created.title == request_data.title, (
+            "Title не совпадает с исходными данными"
+        )
+        assert created.verified == request_data.verified, (
+            "Флаг verified должен совпадать"
+        )
