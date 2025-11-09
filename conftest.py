@@ -10,7 +10,9 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.remote.webdriver import WebDriver
 from webdriver_manager.chrome import ChromeDriverManager
 
+from src.api.actions.entity_actions import EntityActions
 from src.api.client import APIClient
+from src.api.models import EntityRequest
 from src.utils.config import get_test_config
 
 
@@ -60,8 +62,22 @@ def driver(request: pytest.FixtureRequest) -> Generator[WebDriver, Any, Any]:
 def api_client() -> Generator[APIClient, None, None]:
     """Создаёт и возвращает экземпляр APIClient."""
     with allure.step("Создаём экземпляр APIClient"):
-        client = APIClient()
-        yield client
+        api_client = APIClient()
+        yield api_client
+
+
+@pytest.fixture(scope="function")
+def entity(api_client):
+    """Создаёт тестовую сущность перед каждым тестом и удаляет после."""
+    actions = EntityActions(api_client)
+    entity = actions.create_entity(EntityRequest.random())
+    yield entity
+    actions.delete_entity(entity.id)
+
+
+@pytest.fixture(scope="function")
+def entity_actions(api_client):
+    return EntityActions(api_client)
 
 
 @pytest.hookimpl(hookwrapper=True)
