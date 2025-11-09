@@ -1,14 +1,16 @@
-import requests
 import allure
+import requests
+
 from src.data.urls import APIUrls
 
 
 class APIClient:
     def __init__(self, base_url: str = APIUrls.BASE_URL):
-        self.base_url = base_url.rstrip("/")
+        self.base_url = base_url
 
     @allure.step("GET запрос: {endpoint}")
     def get(self, endpoint: str, **kwargs):
+        print(f"GET QUERY = {self.base_url}{endpoint}")
         return requests.get(f"{self.base_url}{endpoint}", **kwargs)
 
     @allure.step("POST запрос: {endpoint}")

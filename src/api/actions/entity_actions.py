@@ -1,41 +1,48 @@
 import allure
+
 from src.api.client import APIClient
-from src.api.models.entity import Entity
-from src.api.endpoints import Endpoints
+from src.api.models.entity_request import EntityRequest
+from src.api.models.entity_response import EntityResponse
+from src.api.utils.deserializer import parse_list_response, parse_response
+from src.data import Endpoints
 
 
 class EntityActions:
+    """Слой бизнес-логики API для работы с сущностями."""
+
     def __init__(self, client: APIClient):
         self.client = client
 
-    @allure.step("Создание новой сущности: {entity.name}")
-    def create_entity(self, entity: Entity) -> int:
-        response = self.client.post(Endpoints.CREATE, json=entity.dict(exclude_none=True))
-        response.raise_for_status()
-        return response.json().get("id")
-
-    @allure.step("Получение всех сущностей")
-    def get_all_entities(self) -> list[Entity]:
-        response = self.client.get(Endpoints.GET_ALL)
-        response.raise_for_status()
-        return [Entity(**r) for r in response.json()]
-
-    @allure.step("Получение сущности по ID: {entity_id}")
-    def get_entity_by_id(self, entity_id: int) -> Entity:
-        response = self.client.get(Endpoints.GET_BY_ID.format(id=entity_id))
-        response.raise_for_status()
-        return Entity(**response.json())
-
-    @allure.step("Изменение сущности с ID {entity_id}")
-    def patch_entity(self, entity_id: int, new_name: str) -> Entity:
-        response = self.client.patch(
-            Endpoints.PATCH.format(id=entity_id), json={"name": new_name}
+    def create_entity(self, entity: EntityRequest) -> EntityResponse:
+        allure.step("Создание новой сущности: {entity.title}")
+        response = self.client.post(
+            Endpoints.CREATE, json=entity.model_dump(exclude_none=True)
         )
         response.raise_for_status()
-        return Entity(**response.json())
+        return parse_response(EntityResponse, response)
 
-    @allure.step("Удаление сущности с ID {entity_id}")
-    def delete_entity(self, entity_id: int) -> bool:
-        response = self.client.delete(Endpoints.DELETE.format(id=entity_id))
+    @allure.step("Получение сущности по ID: {entity_id}")
+    def get_entity_by_id(self, entity_id: int) -> EntityResponse:
+        response = self.client.get(f"{Endpoints.GET_BY_ID}/{entity_id}")
         response.raise_for_status()
-        return response.status_code == 204
+        return parse_response(EntityResponse, response)
+
+    @allure.step("Получение списка всех сущностей")
+    def get_all_entities(self) -> list[EntityResponse]:
+        response = self.client.get(Endpoints.GET_ALL)
+        response.raise_for_status()
+        return parse_list_response(EntityResponse, response)
+
+    @allure.step("Частичное обновление сущности ID={entity_id}")
+    def patch_entity(self, entity_id: int, entity: EntityRequest) -> EntityResponse:
+        response = self.client.patch(
+            f"{Endpoints.PATCH}/{entity_id}", json=entity.model_dump(exclude_none=True)
+        )
+        response.raise_for_status()
+        return parse_response(EntityResponse, response)
+
+    @allure.step("Удаление сущности ID={entity_id}")
+    def delete_entity(self, entity_id: int) -> dict:
+        response = self.client.delete(f"{Endpoints.DELETE}/{entity_id}")
+        response.raise_for_status()
+        return response.json()
