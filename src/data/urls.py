@@ -4,5 +4,6 @@ class URLs:
     MANAGER_URL: str = f"{BASE_URL}/#/manager"
     CUSTOMER_URL: str = f"{BASE_URL}/#/customer"
 
+
 class APIUrls:
-    BASE_URL: str = "http://127.0.0.1:8080/"
+    BASE_URL: str = "http://localhost:8080/"
