@@ -70,7 +70,7 @@ def api_client() -> Generator[APIClient, None, None]:
 def entity(api_client):
     """Создаёт тестовую сущность перед каждым тестом и удаляет после."""
     actions = EntityActions(api_client)
-    entity = actions.create_entity(EntityRequest.random())
+    entity = actions.create_entity_synthetic(EntityRequest.random())
     yield entity
     actions.delete_entity(entity.id)
 
