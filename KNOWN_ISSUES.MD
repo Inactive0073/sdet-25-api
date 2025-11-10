@@ -5,7 +5,7 @@
 
 ---
 
-## 🧱 1. Deadlock при множественных запросах на создание сущностей
+## 1. Issue #001 Deadlock при множественных запросах на создание сущностей
 
 **Описание:**  
 При параллельных вызовах эндпоинта  
@@ -39,7 +39,7 @@ pgconn.(*PgConn).flushWithPotentialWriteReadDeadlock
 
 ---
 
-## 🧩 2. Несоответствие API-контракта (Response != Schema)
+## 2. Issue #002 Несоответствие API-контракта (Response != Schema)
 
 **Описание:**  
 Эндпоинт `POST /api/create` согласно Swagger должен возвращать объект `Entity`,  
@@ -48,6 +48,9 @@ pgconn.(*PgConn).flushWithPotentialWriteReadDeadlock
 **Влияние:**  
 Pydantic-валидация (`EntityResponse(**response.json())`) вызывает ошибку `TypeError: argument after ** must be a mapping`.
 
+**Ожидаемое поведение:**  
+Возврат JSON-объекта с атрибутом `id` и всеми переданными полями (`EntityResponse`).
+
 **Рекомендации:**
 - временно использовать безопасный парсер:
   ```python
@@ -55,11 +58,11 @@ Pydantic-валидация (`EntityResponse(**response.json())`) вызывае
   ```
   с fallback-логикой при получении `int`
 - оформить баг-репорт на backend:
-  > Backend should return full JSON object, not plain ID
+  Backend should return full JSON object, not plain ID
 
 ---
 
-## 🧠 3. Миграции SQL вызывают ошибку `limit 1 short`
+## 3. Issue #003 Миграции SQL вызывают ошибку `limit 1 short`
 
 **Описание:**  
 При запуске контейнера `migrate` возможна ошибка:
@@ -80,6 +83,25 @@ error: limit 1 short
 
 ---
 
+### ⚠️ Issue #004 — Ошибка при получении несуществующей сущности (`GET /api/get/{id}`)
+**Описание:**  
+Если запрашивается несуществующая сущность, API возвращает `500 Internal Server Error`  
+вместо ожидаемого `404 Not Found`.
+
+**Ожидаемое поведение:**  
+Возврат корректного кода `404` и тела с описанием ошибки.
+
+---
+
+### ⚠️ Issue #005 — Ошибка при удалении несуществующей сущности (`DELETE /api/delete/{id}`)
+**Описание:**  
+Удаление по несуществующему `id` возвращает `500 Internal Server Error`,  
+вместо корректного `404 Not Found` или `410 Gone`.
+
+**Ожидаемое поведение:**  
+Возврат `404 Not Found` для отсутствующей сущности и `204 No Content` для успешного удаления.
+
+
 ## 📊 Формат фиксации известных проблем в Allure
 
 Все известные баги должны фиксироваться через `pytest.skip()` с attach-логом:
@@ -93,7 +115,7 @@ def test_create_entity(api_client):
         result = EntityActions(api_client).create_entity(EntityRequest.random())
         assert result.id is not None
     except Exception as e:
-        if "deadlock" in str(e).lower():
+        if "deadlock" in str(e).lower(): # mock представление, в реальном кейсе такую ошибку можно просмотреть только в контейнере
             allure.attach(str(e), "known_issue_deadlock", allure.attachment_type.TEXT)
             pytest.skip("Известный баг: PostgreSQL deadlock при параллельных insert")
         raise
