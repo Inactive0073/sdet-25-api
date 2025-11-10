@@ -10,7 +10,6 @@ class APIClient:
 
     @allure.step("GET запрос: {endpoint}")
     def get(self, endpoint: str, **kwargs):
-        print(f"GET QUERY = {self.base_url}{endpoint}")
         return requests.get(f"{self.base_url}{endpoint}", **kwargs)
 
     @allure.step("POST запрос: {endpoint}")

@@ -24,8 +24,11 @@ class EntityRequest(BaseModel):
         with_optional: bool = True,
         length_list: int = 5,
         unique_list: bool = True,
+        verified: Optional[bool] = None 
     ) -> "EntityRequest":
         """Генерирует случайную сущность с использованием Faker."""
+        _verified = verified if verified else fake.boolean() 
+        
         if with_optional:
             addition = Addition(
                 additional_info=fake.sentence(nb_words=6),
@@ -40,12 +43,12 @@ class EntityRequest(BaseModel):
                 addition=addition,
                 important_numbers=important_numbers,
                 title=fake.sentence(nb_words=3),
-                verified=fake.boolean(),
+                verified=_verified,
             )
         else:
             return cls(
                 title=fake.sentence(nb_words=3),
-                verified=fake.boolean(),
+                verified=_verified,
             )
 
     model_config = ConfigDict(

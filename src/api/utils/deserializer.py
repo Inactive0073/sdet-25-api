@@ -26,11 +26,31 @@ def parse_response(model, response: Response):
         )
 
 
-@allure.step("Десериализация списка объектов в {model.__name__}")
 def parse_list_response(model, response: Response):
     """Парсит список ответов API в список моделей. Работает как с `[{}, {}]`, так и с `{'entity': [...]}`."""
+    allure.step(f"Десериализация списка объектов в {model.__name__}")
     try:
         data = response.json()
+    except json.JSONDecodeError:
+        # 🔹 Если сервер вернул строку, но не JSON
+        text = response.text.strip()
+        allure.attach(
+            text,
+            name="invalid_json_body",
+            attachment_type=allure.attachment_type.TEXT,
+        )
+
+        if not text:
+            raise AssertionError(
+                f"Пустое тело ответа от API. Ожидался JSON объект модели {model.__name__}."
+            )
+
+        raise AssertionError(
+            f"Ответ не является корректным JSON.\n"
+            f"Получено: {text[:200]}...\n"
+            f"URL: {response.url}\n"
+            f"Status: {response.status_code}"
+        )
     except ValueError as e:
         raise AssertionError(
             f"Ответ не является корректным JSON: {e}\nТело: {response.text}"
