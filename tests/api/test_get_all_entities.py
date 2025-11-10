@@ -31,7 +31,7 @@ class TestGetAllEntities:
     def test_get_all_entities(self, api_client: APIClient):
         actions = EntityActions(api_client)
         created_entities = [
-            actions.create_entity(EntityRequest.random()) for _ in range(3)
+            actions.create_entity_synthetic(EntityRequest.random()) for _ in range(3)
         ]
         entities = actions.get_all_entities()
 

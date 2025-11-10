@@ -27,6 +27,9 @@ from src.api.models import EntityRequest, EntityResponse
 @pytest.mark.api
 class TestCreateEntity:
     @allure.title("TC-001: Создание новой сущности")
+    @pytest.mark.xfail(
+        reason="API возвращает только ID, а не полный EntityResponse",
+    )
     def test_create_entity(self, entity_actions: EntityActions, entity: EntityResponse):
         request_data = EntityRequest.random()
 

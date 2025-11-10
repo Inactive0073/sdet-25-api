@@ -30,12 +30,10 @@ class TestPatchEntity:
     @allure.title("TC-004: Частичное обновление сущности")
     def test_patch_entity(self, api_client: APIClient):
         actions = EntityActions(api_client)
-        original = actions.create_entity(EntityRequest.random())
+        original = actions.create_entity_synthetic(EntityRequest.random())
         updated_request = EntityRequest.random()
-        updated = actions.patch_entity(original.id, updated_request)
+        response = actions.patch_entity(original.id, updated_request)
 
-        assert isinstance(updated, EntityResponse), (
-            "Ответ не соответствует модели EntityResponse"
-        )
-        assert updated.id == original.id, "ID должен остаться тем же"
-        assert updated.title != original.title, "Title должен измениться"
+        assert 200 <= int(response.status_code) <= 204, f"Статус код не соответствует ожидаемому. Текущий статус код: {response.status_code}" 
+        updated = actions.get_entity_by_id(original.id)
+        assert updated.title == updated_request.title

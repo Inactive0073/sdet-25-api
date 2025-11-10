@@ -29,7 +29,7 @@ class TestGetEntityById:
     @allure.title("TC-002: Получение сущности по ID")
     def test_get_entity_by_id(self, api_client: APIClient):
         actions = EntityActions(api_client)
-        created = actions.create_entity(EntityRequest.random())
+        created = actions.create_entity_synthetic(EntityRequest.random())
 
         fetched = actions.get_entity_by_id(created.id)
 
