@@ -22,8 +22,8 @@ jobs:
       
       - name: Bring up services
         run: |
-          docker-compose down
-          docker-compose up --build -d
+          docker compose down
+          docker compose up --build -d
 
       - name: Wait for API to be ready
         run: |
