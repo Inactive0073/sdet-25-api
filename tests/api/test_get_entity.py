@@ -27,11 +27,10 @@ from src.api.models.entity_response import EntityResponse
 @pytest.mark.api
 class TestGetEntityById:
     @allure.title("TC-002: Получение сущности по ID")
-    def test_get_entity_by_id(self, api_client: APIClient):
-        actions = EntityActions(api_client)
-        created = actions.create_entity_synthetic(EntityRequest.random())
+    def test_get_entity_by_id(self, entity_actions: EntityActions):
+        created = entity_actions.create_entity_synthetic(EntityRequest.random())
 
-        fetched = actions.get_entity_by_id(created.id)
+        fetched = entity_actions.get_entity_by_id(created.id)
 
         assert isinstance(fetched, EntityResponse), (
             "Ответ не соответствует модели EntityResponse"

@@ -29,13 +29,12 @@ from src.data.endpoints import Endpoints
 @pytest.mark.api
 class TestDeleteEntity:
     @allure.title("TC-005: Удаление сущности по ID")
-    def test_delete_entity(self, api_client: APIClient):
-        actions = EntityActions(api_client)
-        created = actions.create_entity_synthetic(EntityRequest.random())
+    def test_delete_entity(self, entity_actions: EntityActions):
+        created = entity_actions.create_entity_synthetic(EntityRequest.random())
 
         # --- Первичное удаление ---
         with allure.step("Удаляем созданную сущность"):
-            delete_response = actions.delete_entity(created.id)
+            delete_response = entity_actions.delete_entity(created.id)
             allure.attach(
                 json.dumps(dict(delete_response.headers), indent=2),
                 name="delete_response_headers",
@@ -47,7 +46,7 @@ class TestDeleteEntity:
 
         # --- GET после удаления ---
         with allure.step("Проверяем, что объект действительно удалён"):
-            get_after_delete = actions.client.get(
+            get_after_delete = entity_actions.client.get(
                 Endpoints.GET_BY_ID.format(id=created.id)
             )
             allure.attach(
@@ -72,7 +71,7 @@ class TestDeleteEntity:
 
         # --- Повторное удаление ---
         with allure.step("Повторное удаление той же сущности"):
-            second_delete = actions.delete_entity(created.id)
+            second_delete = entity_actions.delete_entity(created.id)
             allure.attach(
                 json.dumps(dict(second_delete.headers), indent=2),
                 name="second_delete_response_headers",

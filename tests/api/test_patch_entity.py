@@ -28,12 +28,11 @@ from src.api.models.entity_response import EntityResponse
 @pytest.mark.api
 class TestPatchEntity:
     @allure.title("TC-004: Частичное обновление сущности")
-    def test_patch_entity(self, api_client: APIClient):
-        actions = EntityActions(api_client)
-        original = actions.create_entity_synthetic(EntityRequest.random())
+    def test_patch_entity(self, entity_actions: EntityActions):
+        original = entity_actions.create_entity_synthetic(EntityRequest.random())
         updated_request = EntityRequest.random()
-        response = actions.patch_entity(original.id, updated_request)
+        response = entity_actions.patch_entity(original.id, updated_request)
 
         assert 200 <= int(response.status_code) <= 204, f"Статус код не соответствует ожидаемому. Текущий статус код: {response.status_code}" 
-        updated = actions.get_entity_by_id(original.id)
+        updated = entity_actions.get_entity_by_id(original.id)
         assert updated.title == updated_request.title

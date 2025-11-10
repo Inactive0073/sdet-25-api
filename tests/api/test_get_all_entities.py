@@ -28,12 +28,11 @@ from src.api.models.entity_response import EntityResponse
 @pytest.mark.api
 class TestGetAllEntities:
     @allure.title("TC-003: Получение списка всех сущностей")
-    def test_get_all_entities(self, api_client: APIClient):
-        actions = EntityActions(api_client)
+    def test_get_all_entities(self, entity_actions: EntityActions):
         created_entities = [
-            actions.create_entity_synthetic(EntityRequest.random()) for _ in range(3)
+            entity_actions.create_entity_synthetic(EntityRequest.random()) for _ in range(3)
         ]
-        entities = actions.get_all_entities()
+        entities = entity_actions.get_all_entities()
 
         assert isinstance(entities, list), "Ответ должен быть списком"
         assert all(isinstance(e, EntityResponse) for e in entities), (

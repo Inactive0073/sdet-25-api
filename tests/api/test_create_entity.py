@@ -30,7 +30,7 @@ class TestCreateEntity:
     @pytest.mark.xfail(
         reason="API возвращает только ID, а не полный EntityResponse",
     )
-    def test_create_entity(self, entity_actions: EntityActions, entity: EntityResponse):
+    def test_create_entity(self, entity_actions: EntityActions):
         request_data = EntityRequest.random()
 
         created = entity_actions.create_entity(request_data)
