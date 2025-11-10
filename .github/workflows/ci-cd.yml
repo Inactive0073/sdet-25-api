@@ -19,7 +19,23 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+      
+      - name: Bring up services
+        run: |
+          docker-compose down
+          docker-compose up --build -d
 
+      - name: Wait for API to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:8080/api/getAll; then
+              echo "API is up"
+              break
+            fi
+            echo "Waiting for API..."
+            sleep 2
+          done
+      
       - run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
