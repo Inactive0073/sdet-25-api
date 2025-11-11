@@ -2,7 +2,6 @@ import allure
 import pytest
 
 from src.api.actions.entity_actions import EntityActions
-from src.api.client import APIClient
 from src.api.models.entity_request import EntityRequest
 from src.api.models.entity_response import EntityResponse
 

@@ -2,7 +2,6 @@ import allure
 import pytest
 
 from src.api.actions.entity_actions import EntityActions
-from src.api.client import APIClient
 from src.api.models.entity_request import EntityRequest
 from src.api.models.entity_response import EntityResponse
 
@@ -27,15 +26,15 @@ from src.api.models.entity_response import EntityResponse
 @pytest.mark.api
 class TestGetEntityById:
     @allure.title("TC-002: Получение сущности по ID")
-    def test_get_entity_by_id(self, entity_actions: EntityActions):
-        created = entity_actions.create_entity_synthetic(EntityRequest.random())
+    def test_get_entity_by_id(self, entity: EntityResponse, entity_actions: EntityActions):
+        entity = entity_actions.create_entity_synthetic(EntityRequest.random())
 
-        fetched = entity_actions.get_entity_by_id(created.id)
+        fetched = entity_actions.get_entity_by_id(entity.id)
 
         assert isinstance(fetched, EntityResponse), (
             "Ответ не соответствует модели EntityResponse"
         )
-        assert fetched.id == created.id, (
-            f"ID должен совпадать: ожидали {created.id}, получили {fetched.id}"
+        assert fetched.id == entity.id, (
+            f"ID должен совпадать: ожидали {entity.id}, получили {fetched.id}"
         )
-        assert fetched.title == created.title, "Title должен совпадать"
+        assert fetched.title == entity.title, "Title должен совпадать"

@@ -48,7 +48,7 @@ class EntityActions:
 
         try:
             return parse_response(EntityResponse, response)
-        except AssertionError as e:
+        except AssertionError:
             # Если API вернул невалидный ответ — проверим, что это наш случай
             data = response.json()
             if isinstance(data, int):

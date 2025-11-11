@@ -2,9 +2,7 @@ import allure
 import pytest
 
 from src.api.actions.entity_actions import EntityActions
-from src.api.client import APIClient
 from src.api.models.entity_request import EntityRequest
-from src.api.models.entity_response import EntityResponse
 
 
 @allure.parent_suite("API test-service")
@@ -29,11 +27,10 @@ from src.api.models.entity_response import EntityResponse
 class TestGetAllEntitiesPagination:
     @allure.title("TC-006: Проверка пагинации в getAll")
     @pytest.mark.parametrize("verified, expected_count", [(True, 3), (False, 3)])
-    def test_get_all_with_verified(self, entity_actions: EntityActions, verified, expected_count):
+    def test_get_all_with_pagination(self, entity_actions: EntityActions, verified, expected_count):
         for _ in range(3):
             entity_actions.create_entity_synthetic(EntityRequest.random(verified=verified))
 
         page1 = entity_actions.get_all_entities(verified=verified, page=1, per_page=3)
-        print(len(page1))
         assert len(page1) == expected_count, f"Ожидали {expected_count} элементов для verified={verified}"
 
