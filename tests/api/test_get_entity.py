@@ -27,8 +27,6 @@ from src.api.models.entity_response import EntityResponse
 class TestGetEntityById:
     @allure.title("TC-002: Получение сущности по ID")
     def test_get_entity_by_id(self, entity: EntityResponse, entity_actions: EntityActions):
-        entity = entity_actions.create_entity_synthetic(EntityRequest.random())
-
         fetched = entity_actions.get_entity_by_id(entity.id)
 
         assert isinstance(fetched, EntityResponse), (

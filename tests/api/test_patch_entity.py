@@ -28,7 +28,6 @@ from src.api.models.entity_response import EntityResponse
 class TestPatchEntity:
     @allure.title("TC-004: Частичное обновление сущности")
     def test_patch_entity(self, entity: EntityResponse, entity_actions: EntityActions):
-        entity = entity_actions.create_entity_synthetic(EntityRequest.random())
         updated_request = EntityRequest.random()
         response = entity_actions.patch_entity(entity.id, updated_request)
 
