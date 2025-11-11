@@ -4,6 +4,7 @@ from typing import Any, Generator
 
 import allure
 import pytest
+import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.service import Service as ChromeService
@@ -72,8 +73,10 @@ def entity(api_client):
     actions = EntityActions(api_client)
     entity = actions.create_entity_synthetic(EntityRequest.random())
     yield entity
-    actions.delete_entity(entity.id)
-
+    try:
+        actions.delete_entity(entity.id)
+    except requests.HTTPError: # пропускаем если сущность уже была удалена, в тестах отлавливается этот случай
+        pass                   # test_delete_entity XFAIL (Known backend issue: GET by non-existing ID returns 500 instead of 404)   
 
 @pytest.fixture(scope="function")
 def entity_actions(api_client):
